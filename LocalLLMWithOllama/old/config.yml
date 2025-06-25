@@ -1,0 +1,8 @@
+models:
+  llama2:
+    q4_0: "llama2"           # default 4-bit chat model :contentReference[oaicite:2]{index=2}
+    q8_0: "llama2:8b-instruct-q8_0"
+    fp16: "llama2:fp16"
+  wizardlm:
+    q4_0: "wizardlm:70b-llama2-q4_0"  # by default Ollama uses 4-bit :contentReference[oaicite:3]{index=3}
+    q8_0: "wizardlm:70b-llama2-q8_0"

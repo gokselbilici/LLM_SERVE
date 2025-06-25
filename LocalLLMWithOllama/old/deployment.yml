@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama-api
+  template:
+    metadata:
+      labels:
+        app: ollama-api
+    spec:
+      containers:
+      - name: ollama-api
+        image: your-registry/ollama-api:latest
+        ports:
+        - containerPort: 8000   # FastAPI
+        - containerPort: 11434  # Ollama
+        env:
+        - name: DEFAULT_MODEL
+          value: "llama2"
+        - name: DEFAULT_QUANT
+          value: "q4_0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-api
+spec:
+  selector:
+    app: ollama-api
+  ports:
+  - name: api
+    port: 80
+    targetPort: 8000
+  type: ClusterIP

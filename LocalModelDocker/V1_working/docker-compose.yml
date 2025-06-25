@@ -1,0 +1,29 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-api-server
+    ports:
+      - "11434:11434"
+    volumes:
+      # Use forward slashes and quotes for Windows paths
+      - "D:/JYN/EZ/EGITIM/LLM_Model_Registry/OLLAMA/models:/root/.ollama/models"
+    restart: unless-stopped
+    networks:
+      - ollama-network
+
+  api-wrapper:
+    build: .
+    container_name: ollama-wrapper
+    ports:
+      - "9999:9999"
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    networks:
+      - ollama-network
+    restart: unless-stopped
+
+networks:
+  ollama-network:
+    driver: bridge

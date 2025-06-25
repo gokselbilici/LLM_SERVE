@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-api-server
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: fastapi-wrapper
+    ports:
+      - "9999:9999"
+    depends_on:
+      - ollama
+    networks:
+      - app-network
+    restart: unless-stopped
+    env_file:
+      - .env
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
