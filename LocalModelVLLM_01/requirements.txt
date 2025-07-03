@@ -1,0 +1,8 @@
+vllm
+fastapi
+uvicorn
+transformers
+torch
+huggingface-hub
+pydantic
+typing-extensions

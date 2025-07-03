@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  qwen-vllm:
+    build: .
+    container_name: qwen-vllm-server
+    ports:
+      - "9999:9999"
+    volumes:
+      # Mount your local model directory
+      - "D:/JYN/EZ/EGITIM/LLM_Model_Registry/HuggingFaceRepo/app/models:/app/models"
+    environment:
+      - MODEL_PATH=/app/models
+      - HF_HOME=/app/cache
+      - CUDA_VISIBLE_DEVICES=0  # Adjust based on your GPU setup
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9999/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
