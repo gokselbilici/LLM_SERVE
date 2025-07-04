@@ -1,5 +1,5 @@
 # Use NVIDIA CUDA base image for GPU support
-FROM nvidia/cuda:12.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu20.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -29,6 +29,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY main.py .
 COPY download_model.py .
+COPY constants.py .
 
 # Create model directory
 RUN mkdir -p /app/models

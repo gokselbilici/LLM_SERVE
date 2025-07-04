@@ -1,83 +1,107 @@
-# Qwen2.5-0.5B vLLM Server
+# Qwen2.5-0.5B vLLM Server (GPU-Powered via Docker)
 
-This project runs a **FastAPI-based OpenAI-compatible LLM server** using **vLLM** and **Qwen2.5-0.5B-Instruct** model from Hugging Face. The model is downloaded and served locally with GPU acceleration in a Docker container.
-
----
-
-## 🔧 Features
-
-- ✅ OpenAI-style `/v1/chat/completions` endpoint
-- ✅ Docker & Docker Compose with GPU support
-- ✅ Custom FastAPI server with health checks
-- ✅ Uses Hugging Face `snapshot_download()` to download and manage models
-- ✅ Environment-configurable paths and model name
+This project serves the **Qwen2.5-0.5B-Instruct** model using [vLLM](https://github.com/vllm-project/vllm) and a **FastAPI** backend inside a GPU-enabled Docker container. It supports **OpenAI-compatible chat completions**.
 
 ---
 
-## 🗂️ Project Structure
+## 🚀 Features
+
+- ✅ OpenAI-style endpoint: `/v1/chat/completions`
+- ✅ GPU acceleration via CUDA 12.8
+- ✅ Model loaded from local Hugging Face snapshot
+- ✅ Docker & Docker Compose with NVIDIA runtime
+- ✅ Health-check endpoint
+- ✅ Pre-configured with `torch`, `transformers`, `vllm`, and FastAPI
+
+---
+
+## 📁 Project Structure
 
 ```
 .
-├── Dockerfile
-├── docker-compose.yml
-├── download_model.py
-├── main.py
-├── constants.py
-├── requirements.txt
-├── Makefile
+├── Dockerfile               # Builds the container
+├── docker-compose.yml       # Runs the server with GPU
+├── requirements.txt         # Python dependencies
+├── main.py                  # FastAPI + vLLM inference server
+├── download_model.py        # Downloads model from Hugging Face
+├── constants.py             # Local model path & model name
+├── Makefile                 # CLI commands for Docker tasks
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## ⚙️ Setup Steps
 
-### 1. 📥 Download the Model
-
-You can run this once to download the model locally:
+### Step 1 – 🔽 Download the Model (Optional if already mounted)
 
 ```bash
-python download_model.py "Qwen/Qwen2.5-0.5B-Instruct"
+python download_model.py
 ```
 
-It will save to:
+> This downloads Qwen2.5-0.5B-Instruct to:
+> `D:/JYN/EZ/EGITIM/LLM_Model_Registry/HuggingFaceRepo/app/models`
+
+---
+
+### Step 2 – 🐳 Build & Run
+
+You can use `make` or plain Docker:
+
+```bash
+# Using Makefile
+make build     # Builds the Docker image
+make up        # Starts the container
 ```
-D:\JYN\EZ\EGITIM\LLM_Model_Registry\HuggingFaceRepo\app\models\models--Qwen--Qwen2.5-0.5-Instruct
+
+OR manually:
+
+```bash
+docker build -t vllm_service:latest .
+docker-compose build --no-cache
+docker-compose up
 ```
 
 ---
 
-### 2. 🐳 Build & Run the Container
+## 📡 API Usage
 
-You can use Docker Compose:
+### 🔗 Base URL
 
-```bash
-make build
-make up
+```
+http://localhost:9999
 ```
 
-Or directly:
+### ✅ Endpoints
 
-```bash
-docker-compose up --build
-```
+| Method | Path                  | Description              |
+|--------|-----------------------|--------------------------|
+| GET    | `/`                   | Root message             |
+| GET    | `/health`             | Health + model status    |
+| POST   | `/v1/chat/completions`| OpenAI-style chat endpoint |
 
 ---
 
-## 📡 API Endpoints
+### 🧪 Example Request
 
-- `GET /` — Root health message
-- `GET /health` — Health check status
-- `POST /v1/chat/completions` — OpenAI-compatible completion endpoint
+**URL:**
+```
+POST http://localhost:9999/v1/chat/completions
+```
 
-#### Example request (JSON):
-
+**Request Body:**
 ```json
 {
   "model": "Qwen/Qwen2.5-0.5B-Instruct",
   "messages": [
-    {"role": "user", "content": "What is the capital of Japan?"}
-  ]
+    {
+      "role": "user",
+      "content": "Hello, who are you?"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 512,
+  "top_p": 0.9
 }
 ```
 
@@ -85,9 +109,9 @@ docker-compose up --build
 
 ## 🖥️ Port Mapping
 
-| Host Port | Container Port | Description               |
-|-----------|----------------|---------------------------|
-| `9999`    | `9999`         | FastAPI server (uvicorn)  |
+| Host Port | Container Port | Service         |
+|-----------|----------------|------------------|
+| `9999`    | `9999`         | FastAPI (Uvicorn) |
 
 ---
 
@@ -101,27 +125,26 @@ Defined in `docker-compose.yml`:
 
 ---
 
-## ⚙️ Makefile Commands
-
-See [`Makefile`](Makefile) for CLI shortcuts:
+## 🔧 Makefile Commands
 
 ```bash
-make build     # Build Docker image
-make up        # Start the container
+make build     # Build Docker image (docker-compose build)
+make up        # Start the container (detached)
 make down      # Stop and remove the container
-make logs      # Tail logs from container
+make logs      # View real-time logs
+make restart   # Restart container
+make status    # Check running container status
 ```
 
 ---
 
-## 🧪 Health Check
+## ✅ Health Check
 
 ```bash
 curl http://localhost:9999/health
 ```
 
-Returns:
-
+Expected response:
 ```json
 {
   "status": "healthy",

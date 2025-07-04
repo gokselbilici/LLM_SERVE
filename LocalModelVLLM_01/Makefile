@@ -1,10 +1,10 @@
 # Makefile for managing vLLM + FastAPI server
 
-IMAGE_NAME = vllm-qwen
-CONTAINER_NAME = qwen-vllm-server
+IMAGE_NAME = vllm_service
+CONTAINER_NAME = vllm_container
 
 build:
-	docker-compose build
+	docker-compose build --no-cache
 
 up:
 	docker-compose up -d
