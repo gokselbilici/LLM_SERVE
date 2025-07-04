@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  vllm_api:
+    image: vllm/vllm-openai:latest
+    container_name: vllm_openai_container
+    runtime: nvidia
+    ports:
+      - "9999:8000"
+    volumes:
+      - "D:/JYN/EZ/EGITIM/LLM_Model_Registry/HuggingFaceRepo/app/models:/root/.cache/huggingface"
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=hf_xxx_optional
+    command: >
+      --model /root/.cache/huggingface/models--Qwen--Qwen2.5-0.5B-Instruct
+      --gpu-memory-utilization 0.6
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
