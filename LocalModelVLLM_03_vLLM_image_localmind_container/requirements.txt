@@ -1,8 +1,0 @@
-fastapi==0.112.0
-huggingface-hub
-pydantic
-torch==2.4.0
-transformers
-typing-extensions
-uvicorn
-vllm

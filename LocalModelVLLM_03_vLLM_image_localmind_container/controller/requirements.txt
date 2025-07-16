@@ -1,0 +1,5 @@
+fastapi==0.112.0
+uvicorn
+httpx
+python-dotenv
+loguru
