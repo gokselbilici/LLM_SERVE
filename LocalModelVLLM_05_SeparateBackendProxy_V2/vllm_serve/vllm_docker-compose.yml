@@ -1,0 +1,36 @@
+services:
+  vllm_llm_serving_api:
+    image: vllm/vllm-openai:latest
+    container_name: vllm_openai_container
+    runtime: nvidia
+    ports:
+      - "9990:8000"
+    volumes:
+      - "D:/JYN/EZ/EGITIM/LLM_Model_Registry/HuggingFaceRepo/app/models:/root/.cache/huggingface"
+    env_file:
+      - .env
+    command: >
+      --model ${MODEL_PATH}
+      --gpu-memory-utilization ${GPU_MEMORY_UTIL}
+      --host ${VLLM_HOST}
+      --port ${VLLM_PORT}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - llm_bridge
+
+networks:
+  llm_bridge:
+    external: true
