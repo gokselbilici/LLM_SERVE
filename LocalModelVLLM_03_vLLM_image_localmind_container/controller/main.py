@@ -1,15 +1,25 @@
 from fastapi import FastAPI, Request, Body
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import JSONResponse
 import httpx
 from pydantic import BaseModel
 from typing import List, Literal
 import constants as c
-from loguru import logger
 import logging
+import os
+
+# Ensure logs directory exists
+os.makedirs("logs", exist_ok=True)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    handlers=[
+        logging.FileHandler("logs/controller.log", mode="a", encoding="utf-8"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("local_llm_api_controller")
 
 # Pydantic models for request
 class Message(BaseModel):
@@ -27,23 +37,29 @@ app = FastAPI()
 @app.post("/v1/chat/completions")
 async def chat_completions(payload: ChatCompletionRequest = Body(...)):
     payload_dict = payload.dict()
-    logger.info("Request payload received: {}", payload_dict)
+    logger.info("Received /v1/chat/completions request with %d messages", len(payload_dict["messages"]))
 
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(f"{c.LLM_BACKEND_URL}/v1/chat/completions", json=payload_dict)
             response.raise_for_status()
-            logger.info("Response received from vLLM engine.")
-            logger.debug("Response content: {}", response.text)
-            return JSONResponse(content=response.json())
+
+            # Log response summary
+            json_response = response.json()
+            logger.info("LLM backend responded successfully.")
+            logger.debug("LLM response: %s", str(json_response)[:500])  # log only first 500 chars
+
+            return JSONResponse(content=json_response)
 
     except httpx.HTTPError as e:
-        logger.error("HTTP Error from llm_engine: {}", str(e))
+        logger.error("HTTP error from llm_engine: %s", str(e))
         return JSONResponse(status_code=502, content={"error": "Failed to connect to backend."})
+
     except Exception as e:
-        logger.exception("Unexpected error: {}", str(e))
+        logger.exception("Unexpected error during request.")
         return JSONResponse(status_code=500, content={"error": "Internal server error"})
 
 @app.get("/")
 def root():
+    logger.info("Health check hit: /")
     return {"status": "✅ Controller is up and running!"}
