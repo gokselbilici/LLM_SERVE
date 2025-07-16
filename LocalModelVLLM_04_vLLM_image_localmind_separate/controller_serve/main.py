@@ -75,7 +75,7 @@ async def get_models():
         return JSONResponse(status_code=502, content={"error": "Failed to connect to backend."})
     except Exception as e:
         logger.exception("Unexpected error in /v1/models")
-        return JSONResponse(status_code=500, content={"error": "Internal server error"})
+        return JSONResponse(status_code=500, content={"error": "Internal server error", "details": str(e)})
 
 
 @app.post("/v1/chat/completions")
@@ -101,7 +101,7 @@ async def chat_completions(payload: ChatCompletionRequest = Body(...)):
 
     except Exception as e:
         logger.exception("Unexpected error during request.")
-        return JSONResponse(status_code=500, content={"error": "Internal server error"})
+        return JSONResponse(status_code=500, content={"error": "Internal server error", "details": str(e)})
 
 @app.get("/")
 def root():

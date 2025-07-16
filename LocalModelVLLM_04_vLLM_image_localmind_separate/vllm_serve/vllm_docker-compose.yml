@@ -8,9 +8,10 @@ services:
     volumes:
       - "D:/JYN/EZ/EGITIM/LLM_Model_Registry/HuggingFaceRepo/app/models:/root/.cache/huggingface"
     environment:
-      - HUGGING_FACE_HUB_TOKEN=hf_xxx_optional
+      - MODEL_PATH=/root/.cache/huggingface/models--Qwen--Qwen2.5-0.5B-Instruct
+
     command: >
-      --model /root/.cache/huggingface/models--Qwen--Qwen2.5-0.5B-Instruct
+      --model ${MODEL_PATH}
       --gpu-memory-utilization 0.6
     deploy:
       resources:
@@ -19,6 +20,11 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - llm_bridge
 

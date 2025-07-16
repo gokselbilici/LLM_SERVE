@@ -6,6 +6,8 @@ services:
       - "9999:9999"
     environment:
       - LLM_API_HOST=http://vllm_openai_container:8000
+    volumes:
+      - ./logs:/app/logs
     networks:
       - llm_bridge
 
