@@ -11,8 +11,6 @@ services:
       - BACKEND_TIMEOUT=60.0
     volumes:
       - ./logs:/app/logs
-    depends_on:
-      - vllm_llm_serving_api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9999/health"]
       interval: 30s
