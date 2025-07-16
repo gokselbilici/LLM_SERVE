@@ -151,9 +151,9 @@ curl -X POST \
   -H 'X-Request-ID: test-123' \
   -d '{
     "messages": [
-      { "role": "user", "content": "Selamlar canım" },
+      { "role": "user", "content": "Selamlar" },
       { "role": "assistant", "content": "Selam! Size nasıl yardımcı olabilirim?" },
-      { "role": "user", "content": "Beni tanıyorsan adımı söyle" }
+      { "role": "user", "content": "Kısa bir hikaye anlatabilir misin?" }
     ],
     "temperature": 0.7,
     "top_p": 0.8,

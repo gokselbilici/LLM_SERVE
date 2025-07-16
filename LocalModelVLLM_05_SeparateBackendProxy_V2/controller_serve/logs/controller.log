@@ -1,0 +1,3 @@
+2025-07-16 14:16:57,460 | INFO | local_llm_api_controller | Received /v1/chat/completions request with 1 messages
+2025-07-16 14:17:01,020 | INFO | httpx | HTTP Request: POST http://vllm_openai_container:8000/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-16 14:17:01,021 | INFO | local_llm_api_controller | LLM backend responded successfully.
